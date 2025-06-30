@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>捷運人流查詢</title>
+    <meta charset="UTF-8">
+    <!-- 引入 Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .district-container {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .district-column {
+            width: 200px;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+    <h1 class="text-center mb-4">2024年雙北捷運人流查詢系統</h1>
+    <form method="POST" action="/result">
+        <!-- 月份 -->
+        <fieldset class="mb-4">
+            <legend>選擇月份：</legend>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAllMonths" onclick="toggleAll('month', this)">
+                <label class="form-check-label" for="selectAllMonths">全部月份</label>
+            </div>
+            {% for m in months %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="month" value="{{ m }}" id="month{{ m }}">
+                    <label class="form-check-label" for="month{{ m }}">{{ m }} 月</label>
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <!-- 行政區 -->
+        <fieldset class="mb-4">
+            <legend>選擇行政區：</legend>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="selectAllDistricts" onclick="toggleAll('district', this)">
+                <label class="form-check-label" for="selectAllDistricts">雙北全部行政區</label>
+            </div>
+            <div class="district-container">
+                <div class="district-column">
+                    <strong>台北市</strong><br>
+                    {% for d in districts %}
+                        {% if d in ['中正區','萬華區','大同區','中山區','松山區','大安區','信義區','內湖區','南港區','士林區','北投區','文山區'] %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="district" value="{{ d }}" id="{{ d }}">
+                                <label class="form-check-label" for="{{ d }}">{{ d }}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="district-column">
+                    <strong>新北市</strong><br>
+                    {% for d in districts %}
+                        {% if d not in ['中正區','萬華區','大同區','中山區','松山區','大安區','信義區','內湖區','南港區','士林區','北投區','文山區'] %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="district" value="{{ d }}" id="{{ d }}">
+                                <label class="form-check-label" for="{{ d }}">{{ d }}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 平假日 -->
+        <fieldset class="mb-4">
+            <legend>選擇平假日：</legend>
+            <select class="form-select w-auto" name="day_type">
+                <option value="all">全部</option>
+                <option value="weekday">平日</option>
+                <option value="holiday">假日</option>
+            </select>
+        </fieldset>
+
+        <!-- 查詢按鈕 -->
+        <div class="text-center">
+            <input type="submit" class="btn btn-primary px-4 py-2" value="查詢">
+        </div>
+    </form>
+
+    <script>
+        function toggleAll(name, source) {
+            let checkboxes = document.getElementsByName(name);
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        // 查詢時按鈕提示
+        document.querySelector("form").addEventListener("submit", function () {
+            const btn = document.querySelector("input[type=submit]");
+            btn.disabled = true;
+            btn.value = "查詢中…";
+        });
+    </script>
+</body>
+</html>
